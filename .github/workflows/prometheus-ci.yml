@@ -4,6 +4,7 @@ on:
   push:
     paths:
     - 'Dockerfiles/monitoring/prometheus/*.yml'
+    - 'Dockerfiles/monitoring/prometheus/*.rules'
 
 jobs:
   on-push:
