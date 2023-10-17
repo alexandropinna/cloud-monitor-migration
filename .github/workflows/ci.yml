@@ -1,27 +1,46 @@
-name: Build, Validate and Scan
+name: Verify Prometheus Configuration
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main  # Ajusta esto a tu nombre de rama si no es 'main'
+  pull_request:
+    branches:
+      - main  # Ajusta esto a tu nombre de rama si no es 'main'
 
 jobs:
-  build-validate-scan:
+  verify-config-karancode:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
-    - name: Build Docker image
-      run: docker build -t my-prometheus -f Dockerfiles/prometheus.Dockerfile .
-      
-    - name: Validate Prometheus Configuration
-      run: |
-        docker run --rm -v $(pwd)/Dockerfiles/monitoring/prometheus:/config my-prometheus promtool check config /config/prometheus.yml
-      
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'my-prometheus:latest'
-        format: 'table'
-        exit-code: '1'  # This will fail the job if any vulnerabilities are detected
 
+    - name: Verify Prometheus Configuration (karancode)
+      uses: docker://ghcr.io/karancode/promtool-github-action:latest
+      with:
+        args: check config Dockerfiles/monitoring/prometheus/prometheus.yml
+
+  verify-config-promtool-action:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Verify Prometheus Configuration (promtool-action)
+      uses: karancode/promtool-action@main
+      with:
+        args: check config Dockerfiles/monitoring/prometheus/prometheus.yml
+
+  verify-config-peimanja:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Verify Prometheus Configuration (peimanja)
+      uses: peimanja/promtool-github-actions@master
+      with:
+        args: check config Dockerfiles/monitoring/prometheus/prometheus.yml
