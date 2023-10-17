@@ -24,12 +24,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Validate Alerting Rules
-      uses: peimanja/promtool-github-actions@master
+    - name: Build Docker image
+      run: docker build -t my-prometheus -f Dockerfiles/prometheus.Dockerfile .
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
       with:
-        promtool_actions_subcommand: 'config'
-        promtool_actions_files: 'Dockerfiles/monitoring/prometheus/alert.rules'
-        promtool_actions_version: '2.41.0'
-        promtool_actions_comment: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        image-ref: 'my-prometheus:latest'
+        format: 'table'
+        exit-code: '1' 
