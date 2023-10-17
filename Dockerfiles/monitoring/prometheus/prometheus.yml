@@ -34,7 +34,6 @@ scrape_configs:
     static_configs:
       - targets: ['pushgateway:9091']
 
-
 alerting:
   alertmanagers:
   - scheme: http
