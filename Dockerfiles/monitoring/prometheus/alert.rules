@@ -1,11 +1,29 @@
 groups:
 - name: example
   rules:
-  - alert: HighCPU
-    expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
-    for: 5m
+  - alert: HighCPUUsage
+    expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 2m
     labels:
       severity: warning
     annotations:
-      summary: "High CPU usage"
-      description: "{{ $labels.instance }} has a CPU usage of {{ $value }}%."
+      summary: "High CPU usage detected"
+      description: "Instance {{ $labels.instance }} has a CPU usage of {{ $value }}%."
+
+  - alert: HighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - (node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes)) / node_memory_MemTotal_bytes * 100 > 85
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage detected"
+      description: "Instance {{ $labels.instance }} has a memory usage of {{ $value }}%."
+
+  - alert: HighStorageUsage
+    expr: (node_filesystem_size_bytes{fstype="ext4"} - node_filesystem_free_bytes{fstype="ext4"}) / node_filesystem_size_bytes{fstype="ext4"} * 100 > 85
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High storage usage detected"
+      description: "Instance {{ $labels.instance }} has a storage usage of {{ $value }}%."
