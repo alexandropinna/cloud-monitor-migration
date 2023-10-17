@@ -1,0 +1,110 @@
+version: '3.7'
+
+services:
+
+###################################################################################################
+#                                            PROMETHEUS                                           #
+###################################################################################################
+  prometheus:
+    build:
+      context: ./Dockerfiles
+      dockerfile: prometheus.Dockerfile
+    container_name: prometheus
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+
+###################################################################################################
+#                                              GRAFANA                                            #
+###################################################################################################
+  grafana:
+    build:
+      context: ./Dockerfiles
+      dockerfile: grafana.Dockerfile
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-Bx4NmMypykoNKExE5SoM9jSFm}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    ports: 
+      - "3000:3000"
+
+###################################################################################################
+#                                           ALERT MANAGER                                         #
+###################################################################################################
+  alertmanager:
+    build:
+      context: ./Dockerfiles
+      dockerfile: alertmanager.Dockerfile
+    container_name: alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+
+###################################################################################################
+#                                           NODE EXPORTER                                         #
+###################################################################################################
+  nodeexporter:
+    image: prom/node-exporter:v1.5.0
+    container_name: nodeexporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: unless-stopped
+    ports:
+      - 9100:9100
+
+###################################################################################################
+#                                             CADVISOR                                            #
+###################################################################################################
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.46.0
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      # - /cgroup:/cgroup:ro 
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+
+###################################################################################################
+#                                      PROMETHEUS PUSHGATEWAY                                     #
+###################################################################################################
+  pushgateway:
+    image: prom/pushgateway:v1.5.1
+    container_name: pushgateway
+    restart: unless-stopped
+    ports:
+      - 9091:9091
+
+######################### VOLUMES #########################
+volumes:
+    prometheus_data: {}
+    grafana_data: {}

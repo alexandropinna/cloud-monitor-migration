@@ -1,0 +1,27 @@
+name: Build, Validate and Scan
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-validate-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Build Docker image
+      run: docker build -t my-prometheus -f Dockerfiles/prometheus.Dockerfile .
+      
+    - name: Validate Prometheus Configuration
+      run: |
+        docker run --rm -v $(pwd)/Dockerfiles/monitoring/prometheus:/config my-prometheus promtool check config /config/prometheus.yml
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'my-prometheus:latest'
+        format: 'table'
+        exit-code: '1'  # This will fail the job if any vulnerabilities are detected
+
