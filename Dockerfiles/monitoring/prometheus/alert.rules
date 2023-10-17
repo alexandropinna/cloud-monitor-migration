@@ -1,38 +1,11 @@
 groups:
-- name: targets
+- name: example
   rules:
-  - alert: monitor_service_down
-    expr: up == 0
-    for: 30s
-    labels:
-      severity: critical
-    annotations:
-      summary: "Monitor del servicio no operativo"
-      description: "El servicio {{ $labels.instance }} está caído."
-
-###################################################################################################
-#                                             SERVIDOR                                            #
-###################################################################################################
-
-  ######################### RAM #########################
-  - alert: high_memory_load
-    expr: (sum(node_memory_MemTotal_bytes) - sum(node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes) ) / sum(node_memory_MemTotal_bytes) * 100 > 85
-    for: 30s
+  - alert: HighCPU
+    expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
     labels:
       severity: warning
     annotations:
-      summary: "La memoria del servidor está casi llena"
-      description: "El uso de la memoria del host de Docker es {{humanize $value}}%. Informado por la instancia {{ $labels.instance }} del trabajo {{ $labels.job }}."
-
-  ######################### ALMACENAMIENTO #########################
-  - alert: high_storage_load
-    expr: (node_filesystem_size_bytes{fstype="aufs"} - node_filesystem_free_bytes{fstype="aufs"}) / node_filesystem_size_bytes{fstype="aufs"}  * 100 > 85
-    for: 30s
-    labels:
-      severity: warning
-    annotations:
-      summary: "El almacenamiento del servidor está casi lleno"
-      description: "El uso de almacenamiento del host de Docker es {{ humanize $value}}%. Informado por la instancia {{ $labels.instance }} del trabajo {{ $labels.job }}."
-
-
-
+      summary: "High CPU usage"
+      description: "{{ $labels.instance }} has a CPU usage of {{ $value }}%."
