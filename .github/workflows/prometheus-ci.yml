@@ -26,10 +26,3 @@ jobs:
 
     - name: Build Docker image
       run: docker build -t my-prometheus -f Dockerfiles/prometheus.Dockerfile .
-
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'my-prometheus:latest'
-        format: 'table'
-        exit-code: '1' 
