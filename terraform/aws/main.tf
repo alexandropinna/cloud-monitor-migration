@@ -35,6 +35,8 @@ module "eks" {
 
   # Reference subnet IDs from the VPC module for EKS.
   subnet_ids = module.vpc.eks_subnet_ids
+  sg_ingress_cidr = var.sg_ingress_cidr 
+  
   tags       = var.tags
 }
 

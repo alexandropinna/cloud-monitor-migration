@@ -6,6 +6,8 @@ resource "aws_eks_cluster" "eks_cluster" {
   # Define the VPC configuration for the EKS cluster.
   vpc_config {
     subnet_ids = var.subnet_ids
+    endpoint_public_access  = false
+    public_access_cidrs     = [var.sg_ingress_cidr]
   }
 
   # Ensure necessary IAM role policy attachments are created before the EKS cluster.
