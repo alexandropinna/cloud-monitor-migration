@@ -5,7 +5,7 @@ on:
     branches:
         - main
     paths:
-        - 'Dockerfiles/monitoring/prometheus/*.yml'
+        - '.Dockerfiles/monitoring/terraform/*.tf'
 
 jobs:
   terraform:
