@@ -38,7 +38,6 @@ module "eks" {
   tags       = var.tags
 }
 
-
 resource "aws_ebs_volume" "prometheus_volume" {
   availability_zone = var.availability_zone
   size              = var.volume_size
