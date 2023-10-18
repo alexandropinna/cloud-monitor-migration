@@ -49,7 +49,7 @@ jobs:
 
     - name: Terraform Security Scan
       id: security
-      uses: triat/terraform-security-scan@v2.0.2
+      uses: triat/terraform-security-scan@v3
       with:
         tfsec_version: latest
 
