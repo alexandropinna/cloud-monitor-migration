@@ -5,7 +5,7 @@ on:
     branches:
         - main
     paths:
-        - '.Dockerfiles/monitoring/terraform/*.tf'
+        - './terraform*.tf'
 
 jobs:
   terraform:
