@@ -14,7 +14,8 @@ resource "aws_subnet" "private_subnet" {
   vpc_id                  = aws_vpc.vpc_virginia.id
   cidr_block              = var.private_subnet[count.index]
   availability_zone       = var.azs[count.index]
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
+
   tags = {
     Name = "eks_private_subnet-${local.sufix}"
   }
@@ -26,7 +27,7 @@ resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.vpc_virginia.id
   cidr_block              = var.public_subnet[count.index]
   availability_zone       = var.azs[count.index]
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
   tags = {
     Name = "eks_public_subnet-${local.sufix}"
   }
@@ -67,4 +68,12 @@ resource "aws_route_table_association" "crta_eks_subnets" {
     count.index
   )
   route_table_id = aws_route_table.public_crt.id
+}
+
+
+resource "aws_flow_log" "vpc_flow_log" {
+  log_destination      = var.bucket_id
+  log_destination_type = "s3"
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.vpc_virginia.id
 }

@@ -25,6 +25,9 @@ module "vpc" {
   create_igw         = true  # Explicitly enable Internet Gateway creation.
   enable_nat_gateway = true  # Explicitly enable NAT Gateway creation.
   single_nat_gateway = false # Do not use a single NAT Gateway for all AZs.
+  kms_key_arn = module.kms_key.eks_encryption_key_arn
+  bucket_id = module.s3_bucket.bucket_id
+  
   tags               = var.tags
 }
 
@@ -36,14 +39,30 @@ module "eks" {
   # Reference subnet IDs from the VPC module for EKS.
   subnet_ids = module.vpc.eks_subnet_ids
   sg_ingress_cidr = var.sg_ingress_cidr 
+  # kms_key_arn = module.eks_encryption_key.eks_encryption_key.arn
+  kms_key_arn = module.kms_key.eks_encryption_key_arn
   
   tags       = var.tags
 }
 
-resource "aws_ebs_volume" "prometheus_volume" {
+module "ebs_volume" {
+  source            = "./modules/ebs_volume"
+
   availability_zone = var.availability_zone
-  size              = var.volume_size
-  type              = var.volume_type
+  volume_size       = var.volume_size
+  volume_type       = var.volume_type
   encrypted         = var.encrypted
+  kms_key_arn = module.kms_key.eks_encryption_key_arn
+
   tags              = var.tags
+}
+
+module "kms_key" {
+  source = "./modules/kms_key"
+}
+
+module "s3_bucket" {
+  source              = "./modules/s3_bucket"
+  kms_key_arn = module.kms_key.eks_encryption_key_arn
+  logging_bucket_name = "logging-bucket-name"
 }

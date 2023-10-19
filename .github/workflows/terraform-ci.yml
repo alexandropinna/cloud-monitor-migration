@@ -53,9 +53,9 @@ jobs:
       with:
         tfsec_version: latest
 
-    - name: Publish Security Scan Results
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: tfsec-results
-        path: tfsec-results.txt
+    # - name: Publish Security Scan Results
+    #   if: always()
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: tfsec-results
+    #     path: tfsec-results.txt

@@ -59,3 +59,7 @@ variable "dns_prefix" {
 variable "vm_size" {
   type = string
 }
+variable "api_server_authorized_ip_ranges" {
+  description = "List of CIDR blocks which can access the Kubernetes API server"
+  type        = list(string)
+}

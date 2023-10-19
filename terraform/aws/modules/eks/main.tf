@@ -1,3 +1,4 @@
+
 # Create an EKS cluster.
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
@@ -10,6 +11,13 @@ resource "aws_eks_cluster" "eks_cluster" {
     public_access_cidrs     = [var.sg_ingress_cidr]
   }
 
+  encryption_config {
+    provider {
+      key_arn = var.kms_key_arn
+    }
+    resources = ["secrets"]
+  }
+
   # Ensure necessary IAM role policy attachments are created before the EKS cluster.
   depends_on = [
     aws_iam_role_policy_attachment.eks_cluster_policy_attachment,
@@ -18,7 +26,7 @@ resource "aws_eks_cluster" "eks_cluster" {
 
   # Specify the EKS cluster log types to enable.
   # An empty list means no logs are enabled.
-  enabled_cluster_log_types = []
+  enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   # Add tags to the EKS cluster for better resource identification.
   tags = {
@@ -30,6 +38,7 @@ resource "aws_eks_cluster" "eks_cluster" {
 resource "aws_cloudwatch_log_group" "eks_logs" {
   name              = "/aws/eks/${var.cluster_name}/eks_logs"
   retention_in_days = var.retention_in_days # Define log retention policy.
+  kms_key_id = var.kms_key_arn
 }
 
 # Create a default EKS node group associated with the EKS cluster.

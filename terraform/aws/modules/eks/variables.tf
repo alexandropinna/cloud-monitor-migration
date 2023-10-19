@@ -35,3 +35,8 @@ variable "sg_ingress_cidr" {
   description = "CIDR block for ingress access"
   type        = string
 }
+
+variable "kms_key_arn" {
+  description = "ARN of the KMS key for EKS encryption"
+  type = string
+}

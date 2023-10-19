@@ -61,3 +61,13 @@ variable "single_nat_gateway" {
   description = "Indicates whether to create a single NAT Gateway for all availability zones"
   type        = bool
 }
+
+variable "kms_key_arn" {
+  description = "ARN of the KMS key for EKS encryption"
+  type = string
+}
+
+variable "bucket_id" {
+  type        = string
+  description = "The ARN of the S3 bucket for VPC flow logs"
+}
