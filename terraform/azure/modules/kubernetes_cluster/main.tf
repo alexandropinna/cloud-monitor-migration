@@ -10,8 +10,9 @@ resource "azurerm_kubernetes_cluster" "k8s_cluster" {
   network_profile {
     network_policy = "azure"
     network_plugin = "azure"
+
   }
-  
+
   # Name of the resource group in which the AKS cluster will be created. This is inherited from the resource group.
   resource_group_name = var.resource_group_name
 
@@ -34,6 +35,12 @@ resource "azurerm_kubernetes_cluster" "k8s_cluster" {
   identity {
     # Type of identity used for the AKS cluster. In this case, "SystemAssigned" indicates a managed identity.
     type = "SystemAssigned"
+  }
+
+  role_based_access_control_enabled = true
+
+  oms_agent {
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.oms_workspace.id
   }
 
   # Tags that will be associated with the AKS cluster.
